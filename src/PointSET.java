@@ -1,4 +1,3 @@
-import com.thoughtworks.xstream.mapper.Mapper;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdOut;
@@ -12,40 +11,43 @@ import java.util.TreeSet;
  */
 
 public class PointSET {
+
     TreeSet<Point2D> tS;
 
-    public         PointSET()                               // construct an empty set of points
+    public PointSET()                               // construct an empty set of points
     {
         tS = new TreeSet<Point2D>();
     }
 
-    public           boolean isEmpty()                      // is the set empty?
+    public boolean isEmpty()                      // is the set empty?
     {
         return tS.isEmpty();
     }
 
-    public               int size()                         // number of points in the set
+    public int size()                         // number of points in the set
     {
         return tS.size();
     }
 
-    public              void insert(Point2D p)              // add the point to the set (if it is not already in the set)
+    public void insert(Point2D p)              // add the point to the set (if it is not already in the set)
     {
         if (p == null) throw new NullPointerException();
-        tS.add(p);
+
+        if (p.x() > 1 || p.x() <0 || p.y() > 1 || p.y() < 0) throw new IllegalArgumentException();
+
+        tS.add(new Point2D(p.x(), p.y()));
     }
 
-    public           boolean contains(Point2D p)            // does the set contain point p?
+    public boolean contains(Point2D p)            // does the set contain point p?
     {
         if (p == null) throw new NullPointerException();
+
         return tS.contains(p);
     }
 
-    public              void draw()                         // draw all points to standard draw
+    public void draw()                         // draw all points to standard draw
     {
-        for (Point2D t: tS) t.draw();
-
-
+        for (Point2D p: tS) p.draw();
     }
 
     private  class HvIterator implements Iterator<Point2D>{
@@ -109,12 +111,15 @@ public class PointSET {
         if (p == null) throw new NullPointerException();
 
         Point2D retVal = null;
-        double retDist = Double.MAX_VALUE;
+
+        double minSqDist = Double.MAX_VALUE;
+
         for (Point2D p1 : tS )
-            if (p.distanceTo(p1) < retDist) {
+            if (p.distanceSquaredTo(p1) < minSqDist) {
                 retVal = p1;
-                retDist = p.distanceTo(p1);
+                minSqDist = p.distanceTo(p1);
             }
+
         return retVal;
     }
 

@@ -20,7 +20,7 @@ public class KdTree {
         private Node left;
         private Node rigth;
         private int level;
-        public Node(Point2D key, Node left, Node rigth, RectHV val, int level) {
+        Node(Point2D key, Node left, Node rigth, RectHV val, int level) {
             this.key = key;
             this.left = left;
             this.rigth = rigth;
@@ -63,29 +63,31 @@ public class KdTree {
     {
         if (p == null) throw new NullPointerException();
 
-        root = insertNode(root, p,0,new RectHV(0.0,0.0,1.0,1.0));
+        if (p.x() > 1 || p.x() <0 || p.y() > 1 || p.y() < 0) throw new IllegalArgumentException();
 
-        size++;
+        root = insertNode(root, new Point2D(p.x(), p.y()),0,new RectHV(0.0,0.0,1.0,1.0));
 
     }
 
     private Node insertNode(Node parent, Point2D p, int level, RectHV val) {
 
-        if (parent == null)
-            return new Node(p,null,null, val, level);
-        else
+        if (parent == null) {
+            size++;
+            return new Node(p, null, null, val, level);
+        } else {
+            if (p.equals(parent.key)) return parent;
+
             if (level % 2 == 0) //x-coord
                 if (p.x() < parent.key.x())
-                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(),val.ymin(),parent.key.x(),val.ymax()));  //go left
+                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(), val.ymin(), parent.key.x(), val.ymax()));  //go left
                 else
-                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(parent.key.x(),val.ymin(),val.xmax(),val.ymax()));  //go right
+                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(parent.key.x(), val.ymin(), val.xmax(), val.ymax()));  //go right
             else //y-coord
                 if (p.y() < parent.key.y())
-                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(),val.ymin(),val.xmax(),parent.key.y()));  //go left
+                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(), val.ymin(), val.xmax(), parent.key.y()));  //go left
                 else
-                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(val.xmin(),parent.key.y(),val.xmax(),val.ymax()));  //go right
-
-
+                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(val.xmin(), parent.key.y(), val.xmax(), val.ymax()));  //go right
+        }
         return parent;
 
     }
@@ -132,9 +134,6 @@ public class KdTree {
                 this.next = next;
             }
         }
-
-
-
         PointNode curPoint;
         RectHV rect;
 
@@ -186,16 +185,53 @@ public class KdTree {
             }
         };
     }
-    /*public           Point2D nearest(Point2D p)*/             // a nearest neighbor in the set to point p; null if the set is empty
+
+    private Point2D nearestPoint = null;
+    private double minSqDist = Double.MAX_VALUE;
+
+    public Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
+    {
+        if (p == null) throw new NullPointerException();
+
+        findNearestRec(p, root);
+
+        return nearestPoint;
+    }
+
+    private void findNearestRec(Point2D p, Node n)
+    {
+        if (n == null) return;
+
+        if (n.val.distanceSquaredTo(p) < minSqDist) {
+            if (n.key.distanceSquaredTo(p) < minSqDist) {
+                minSqDist =  n.key.distanceSquaredTo(p);
+                nearestPoint = n.key;
+            }
+            if ((n.level % 2 == 0 && p.x() < n.key.x()) || (n.level % 2 == 1 && p.y() < n.key.y())) {
+                findNearestRec(p, n.left);
+                findNearestRec(p, n.rigth);
+            } else{
+                findNearestRec(p, n.rigth);
+                findNearestRec(p, n.left);
+            }
+        }
+    }
 
     public static void main(String[] args){
         KdTree t = new KdTree();
         t.insert(new Point2D(0.5,0.5));
         t.insert(new Point2D(0.3,0.3));
-        t.insert(new Point2D(0.45,0.8));
+        t.insert(new Point2D(0.1,0.1));
+        /*
+        t.insert(new Point2D(0.5,0.3));
+        t.insert(new Point2D(0.3,0.5));
+        t.insert(new Point2D(0.4,0.5));
+        StdOut.println(t.size());
         StdOut.println(t.contains(new Point2D(0.5,0.5)));
-        for (Point2D p: t.range(new RectHV(0.2,0.2,0.35,0.35)))
+        for (Point2D p: t.range(new RectHV(0.4,0.4,0.6,0.6)))
             StdOut.println(p);
+*/
+        StdOut.println(t.nearest(new Point2D(0.3,0.3)));
 
 
         /*

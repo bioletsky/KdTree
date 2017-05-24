@@ -2,18 +2,18 @@ import edu.princeton.cs.algs4.Point2D
 import edu.princeton.cs.algs4.RectHV
 
 /**
- * Created by 1 on 23.05.2017.
+ * Created by biletskiy on 24.05.2017.
  */
-class KdTreeTest extends GroovyTestCase {
+class PointSETTest extends GroovyTestCase {
     void testIsEmpty() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         assert ps.isEmpty();
         ps.insert(new Point2D(0,0));
         assert !ps.isEmpty();
     }
 
     void testSize() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         ps.insert(new Point2D(0,0));
         assert ps.size() == 1
         ps.insert(new Point2D(0,0));
@@ -23,19 +23,19 @@ class KdTreeTest extends GroovyTestCase {
     }
 
     void testInsert() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         shouldFail(NullPointerException) {ps.insert(null);}
     }
 
     void testContains() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         ps.insert(new Point2D(0,0));
         assert ps.contains(new Point2D(0,0));
         assert !ps.contains(new Point2D(1,1));
     }
 
     void testRange() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         TreeSet ts = new TreeSet();
         TreeSet rTs = new TreeSet();
         ps.insert(new Point2D(0.5, 0.5));
@@ -95,7 +95,7 @@ class KdTreeTest extends GroovyTestCase {
     }
 
     void testNearest() {
-        KdTree ps = new KdTree();
+        PointSET ps = new PointSET();
         ps.insert(new Point2D(0.5, 0.5));
         ps.insert(new Point2D(0.2, 0.2));
         ps.insert(new Point2D(0.5, 0.2));
@@ -107,5 +107,6 @@ class KdTreeTest extends GroovyTestCase {
         assert ps.nearest(new Point2D(0.5,0.5)).equals(new Point2D(0.5,0.5));
         assert ps.nearest(new Point2D(0.5,0.3)).equals(new Point2D(0.5,0.2));
     }
+
 
 }

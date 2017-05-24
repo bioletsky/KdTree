@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 public class PointSET {
 
-    TreeSet<Point2D> tS;
+    private TreeSet<Point2D> tS;
 
     public PointSET()                               // construct an empty set of points
     {
@@ -50,13 +50,13 @@ public class PointSET {
         for (Point2D p: tS) p.draw();
     }
 
-    private  class HvIterator implements Iterator<Point2D>{
+    private  static class HvIterator implements Iterator<Point2D>{
 
         Iterator<Point2D> tsI = null;
         Point2D currentPoint = null;
         RectHV rect;
 
-        public HvIterator(RectHV rect){
+        public HvIterator(RectHV rect, TreeSet tS){
 
             if (rect == null) throw new NullPointerException();
 
@@ -83,11 +83,12 @@ public class PointSET {
         public Point2D next() {
             if (!hasNext()) throw  new NoSuchElementException();
             Point2D retVal = currentPoint;
-            if (!tsI.hasNext())
-                currentPoint=null;
-            else{
-                currentPoint = tsI.next();
-                if (!rect.contains(currentPoint)) currentPoint=null;
+            Point2D iterVal = null;
+            currentPoint = null;
+            while (tsI.hasNext()){
+                iterVal = tsI.next();
+                if (rect.contains(iterVal)) {currentPoint = iterVal; break;}
+                if  (iterVal.y()>rect.ymax()) break;
             }
             return retVal;
         }
@@ -100,7 +101,7 @@ public class PointSET {
         return new Iterable<Point2D>() {
             @Override
             public Iterator<Point2D> iterator() {
-                return new HvIterator(rect);
+                return new HvIterator(rect, tS);
             }
         };
 
@@ -117,7 +118,7 @@ public class PointSET {
         for (Point2D p1 : tS )
             if (p.distanceSquaredTo(p1) < minSqDist) {
                 retVal = p1;
-                minSqDist = p.distanceTo(p1);
+                minSqDist = p.distanceSquaredTo(p1);
             }
 
         return retVal;

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Kdtree.iml" filepath="$PROJECT_DIR$/Kdtree.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KdTree.iml" filepath="$PROJECT_DIR$/KdTree.iml" />
     </modules>
   </component>
 </project>

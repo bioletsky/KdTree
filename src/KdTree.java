@@ -1,4 +1,3 @@
-import com.sun.org.apache.regexp.internal.RE;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.StdDraw;
@@ -105,7 +104,7 @@ public class KdTree {
 
         if (n.key.equals(p)) return true;
 
-        if ((n.level % 2 == 0 && p.x() < n.key.x()) || (n.level % 2 == 1 && p.y() < n.key.y()))
+        if ((n.level % 2 == 0 && p.x() < n.key.x()) || (n.level % 2 != 0 && p.y() < n.key.y()))
             return containsRec(n.left,p);
         else
             return containsRec(n.rigth,p);
@@ -124,7 +123,7 @@ public class KdTree {
 
     }
 
-    private class HvIterator implements Iterator<Point2D> {
+    private static class HvIterator implements Iterator<Point2D> {
 
         private class PointNode {
             private Point2D p;
@@ -139,7 +138,7 @@ public class KdTree {
 
 
 
-        public HvIterator(RectHV rect) {
+        public HvIterator(RectHV rect, Node root) {
 
             this.rect = rect;
 
@@ -181,7 +180,7 @@ public class KdTree {
         return new Iterable<Point2D>() {
             @Override
             public Iterator<Point2D> iterator() {
-                return new HvIterator(rect);
+                return new HvIterator(rect, root);
             }
         };
     }
@@ -192,6 +191,9 @@ public class KdTree {
     public Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty
     {
         if (p == null) throw new NullPointerException();
+
+        nearestPoint = null;
+        minSqDist = Double.MAX_VALUE;
 
         findNearestRec(p, root);
 
@@ -207,7 +209,7 @@ public class KdTree {
                 minSqDist =  n.key.distanceSquaredTo(p);
                 nearestPoint = n.key;
             }
-            if ((n.level % 2 == 0 && p.x() < n.key.x()) || (n.level % 2 == 1 && p.y() < n.key.y())) {
+            if ((n.level % 2 == 0 && p.x() < n.key.x()) || (n.level % 2 != 0 && p.y() < n.key.y())) {
                 findNearestRec(p, n.left);
                 findNearestRec(p, n.rigth);
             } else{

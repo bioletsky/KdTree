@@ -64,32 +64,41 @@ public class KdTree {
 
         if (p.x() > 1 || p.x() <0 || p.y() > 1 || p.y() < 0) throw new IllegalArgumentException();
 
-        root = insertNode(root, new Point2D(p.x(), p.y()),0,new RectHV(0.0,0.0,1.0,1.0));
 
-    }
+        Node curNode = root;
+        Node parNode = null;
+        int level = 0;
 
-    private Node insertNode(Node parent, Point2D p, int level, RectHV val) {
+        while (curNode != null) {
 
-        if (parent == null) {
-            size++;
-            return new Node(p, null, null, val, level);
-        } else {
-            if (p.equals(parent.key)) return parent;
+            if (curNode.key.equals(p)) return;
 
-            if (level % 2 == 0) //x-coord
-                if (p.x() < parent.key.x())
-                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(), val.ymin(), parent.key.x(), val.ymax()));  //go left
-                else
-                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(parent.key.x(), val.ymin(), val.xmax(), val.ymax()));  //go right
-            else //y-coord
-                if (p.y() < parent.key.y())
-                    parent.left = insertNode(parent.left, p, ++level, new RectHV(val.xmin(), val.ymin(), val.xmax(), parent.key.y()));  //go left
-                else
-                    parent.rigth = insertNode(parent.rigth, p, ++level, new RectHV(val.xmin(), parent.key.y(), val.xmax(), val.ymax()));  //go right
+            parNode = curNode;
+            if ((level % 2 == 0 && p.x() < curNode.key.x()) || (level % 2 != 0 && p.y() < curNode.key.y()))
+                curNode = curNode.left;
+            else
+                curNode = curNode.rigth;
+
+            level++;
         }
-        return parent;
 
-    }
+        if (parNode == null)
+            root = new Node(new Point2D(p.x(), p.y()),null,null, new RectHV(0.0,0.0,1.0,1.0),0);
+        else
+            if (level % 2 != 0)
+                if (p.x() < parNode.key.x())
+                    parNode.left = new Node(p,null,null,new RectHV(parNode.val.xmin(), parNode.val.ymin(),parNode.key.x(),parNode.val.ymax()),level);
+                else
+                    parNode.rigth = new Node(p,null,null,new RectHV(parNode.key.x(), parNode.val.ymin(),parNode.val.xmax(),parNode.val.ymax()),level);
+            else
+                if (p.y() < parNode.key.y())
+                    parNode.left = new Node(p,null,null,new RectHV(parNode.val.xmin(), parNode.val.ymin(),parNode.val.xmax(),parNode.key.y()),level);
+                else
+                    parNode.rigth = new Node(p,null,null,new RectHV(parNode.val.xmin(), parNode.key.y(),parNode.val.xmax(),parNode.val.ymax()),level);
+
+        size++;
+}
+
 
     public boolean contains(Point2D p)            // does the set contain point p?
     {

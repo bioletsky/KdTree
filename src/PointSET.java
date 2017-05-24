@@ -56,7 +56,7 @@ public class PointSET {
         Point2D currentPoint = null;
         RectHV rect;
 
-        public HvIterator(RectHV rect, TreeSet tS){
+        public HvIterator(RectHV rect, TreeSet<Point2D> tS){
 
             if (rect == null) throw new NullPointerException();
 

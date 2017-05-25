@@ -168,39 +168,34 @@ public class KdTree {
 
             if (root == null) return;
 
-            if (!rect.intersects(root.val)) return;
-
             push(root);
-
-            while (true) {
-                if (rect.contains(top.n.key)) return;
-                moveNextNode();
-                if (top == null) return;
-            }
 
         }
 
         private void moveNextNode() {
+             //из топа пробуем взять левый елемент
+            //если есть, переходим к нму
+            //если нет, то pop, берем его правый елемент
+            //если он есть, добавляем
+            //если его нет, то pop
+            //короче, pop до тех пор пока не будет правого элемента или пока не опустоишьсмя
 
-            NodeNode oldTop = null;
+            NodeNode oldTop;
 
             if (top == null) return;
-            if (top.n.left != null && top.n.left.val.intersects(rect))
-                push(top.n.left);
-            else if (top.n.rigth != null && top.n.rigth.val.intersects(rect))
-                push(top.n.rigth);
-            else {
-                while (true) {
-                    oldTop = top;
-                    pop();
-                    if (top == null) return;
-                    if (top.n.rigth == null) continue;
-                    if (top.n.rigth == oldTop.n) continue;
-                    if (!top.n.rigth.val.intersects(rect)) continue;
-                    push(top.n.rigth);
-                }
 
+            if (top.n.left != null)
+                push(top.n.left);
+            else {
+                while (top != null && top.n.rigth == null)
+                    pop();
+
+                if (top == null) return;
+                oldTop = top;
+                pop();
+                push(oldTop.n.rigth);
             }
+
         }
 
         @Override
@@ -268,16 +263,20 @@ public class KdTree {
         t.insert(new Point2D(0.5,0.5));
         t.insert(new Point2D(0.3,0.3));
         t.insert(new Point2D(0.1,0.1));
-        /*
         t.insert(new Point2D(0.5,0.3));
         t.insert(new Point2D(0.3,0.5));
         t.insert(new Point2D(0.4,0.5));
-        StdOut.println(t.size());
+        t.insert(new Point2D(0.1,0.5));
+
+        for (Point2D p : t.range(new RectHV(0,0,1,1)))
+            StdOut.println(p);
+
+        /*StdOut.println(t.size());
         StdOut.println(t.contains(new Point2D(0.5,0.5)));
         for (Point2D p: t.range(new RectHV(0.4,0.4,0.6,0.6)))
             StdOut.println(p);
 */
-        StdOut.println(t.nearest(new Point2D(0.3,0.3)));
+        //StdOut.println(t.nearest(new Point2D(0.3,0.3)));
 
 
         /*

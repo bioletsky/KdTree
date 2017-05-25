@@ -170,6 +170,9 @@ public class KdTree {
 
             push(root);
 
+            while (top != null && !rect.contains(top.n.key))
+                moveNextNode();
+
         }
 
         private void moveNextNode() {
@@ -184,10 +187,10 @@ public class KdTree {
 
             if (top == null) return;
 
-            if (top.n.left != null)
+            if (top.n.left != null && top.n.left.val.intersects(rect))
                 push(top.n.left);
             else {
-                while (top != null && top.n.rigth == null)
+                while (top != null && (top.n.rigth == null || !top.n.rigth.val.intersects(rect)))
                     pop();
 
                 if (top == null) return;
@@ -207,7 +210,11 @@ public class KdTree {
         public Point2D next() {
             if (!hasNext()) throw new NoSuchElementException();
             Point2D retVal = top.n.key;
-            moveNextNode();
+
+            do
+                moveNextNode();
+            while (top != null && !rect.contains(top.n.key));
+
             return retVal;
         }
     }
@@ -260,15 +267,15 @@ public class KdTree {
 
     public static void main(String[] args){
         KdTree t = new KdTree();
-        t.insert(new Point2D(0.5,0.5));
+        /*t.insert(new Point2D(0.5,0.5));
         t.insert(new Point2D(0.3,0.3));
         t.insert(new Point2D(0.1,0.1));
         t.insert(new Point2D(0.5,0.3));
         t.insert(new Point2D(0.3,0.5));
         t.insert(new Point2D(0.4,0.5));
-        t.insert(new Point2D(0.1,0.5));
+        t.insert(new Point2D(0.1,0.5));*/
 
-        for (Point2D p : t.range(new RectHV(0,0,1,1)))
+        for (Point2D p : t.range(new RectHV(0.2,0.1,0.4,0.5)))
             StdOut.println(p);
 
         /*StdOut.println(t.size());

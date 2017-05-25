@@ -134,16 +134,29 @@ public class KdTree {
 
     private static class HvIterator implements Iterator<Point2D> {
 
-        private class PointNode {
-            private Point2D p;
-            private PointNode next;
-            private PointNode(Point2D p, PointNode next) {
-                this.p = p;
+        private class NodeNode {
+            private Node n;
+            private NodeNode next;
+            private NodeNode(Node n, NodeNode next) {
+                this.n = n;
                 this.next = next;
             }
         }
-        PointNode curPoint;
+
+        NodeNode top;
         RectHV rect;
+
+        private void pop() {
+            if (top == null) throw new NoSuchElementException();
+            top = top.next;
+        }
+        private void push(Node n){
+            if (top == null)
+                top = new NodeNode(n,null);
+            else
+                top = new NodeNode(n,top);
+        }
+
 
 
 
@@ -151,33 +164,55 @@ public class KdTree {
 
             this.rect = rect;
 
-            curPoint = null;
+            top = null;
 
-            fillIterRec(root);
-        }
+            if (root == null) return;
 
-        private void fillIterRec(Node n) {
+            if (!rect.intersects(root.val)) return;
 
-            if (n == null) return;
+            push(root);
 
-            if (n.val.intersects(rect)) {
-                if (rect.contains(n.key)) curPoint = new PointNode(n.key, curPoint);
-                fillIterRec(n.left);
-                fillIterRec(n.rigth);
+            while (true) {
+                if (rect.contains(top.n.key)) return;
+                moveNextNode();
+                if (top == null) return;
             }
 
         }
 
+        private void moveNextNode() {
+
+            NodeNode oldTop = null;
+
+            if (top == null) return;
+            if (top.n.left != null && top.n.left.val.intersects(rect))
+                push(top.n.left);
+            else if (top.n.rigth != null && top.n.rigth.val.intersects(rect))
+                push(top.n.rigth);
+            else {
+                while (true) {
+                    oldTop = top;
+                    pop();
+                    if (top == null) return;
+                    if (top.n.rigth == null) continue;
+                    if (top.n.rigth == oldTop.n) continue;
+                    if (!top.n.rigth.val.intersects(rect)) continue;
+                    push(top.n.rigth);
+                }
+
+            }
+        }
+
         @Override
         public boolean hasNext() {
-            return curPoint != null;
+            return top != null;
         }
 
         @Override
         public Point2D next() {
             if (!hasNext()) throw new NoSuchElementException();
-            Point2D retVal = curPoint.p;
-            curPoint = curPoint.next;
+            Point2D retVal = top.n.key;
+            moveNextNode();
             return retVal;
         }
     }
